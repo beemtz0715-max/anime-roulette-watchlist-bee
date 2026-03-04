@@ -1,6 +1,7 @@
-import { useFetch, useCountdown } from '@vueuse/core'
+import { useFetch, useCountdown, useLocalStorage } from '@vueuse/core'
 import { ref } from 'vue'
 
+const WATCHLIST_KEY = 'anime-roulette-watchlist'
 const URL = 'https://api.jikan.moe/v4/random/anime'
 const MAX_SAFE_SPIN_ATTEMPTS = 5
 const RETRY_SECONDS = 10
@@ -15,6 +16,7 @@ export function useAnimeRoulette() {
   const loading = ref(false)
   const error = ref('')
   const { remaining: cooldownLeft, start: startCooldown } = useCountdown(0, { interval: 1000 })
+  const watchlist = useLocalStorage(WATCHLIST_KEY, [])
 
   const spin = async () => {
     if (loading.value || cooldownLeft.value > 0) return
@@ -31,27 +33,19 @@ export function useAnimeRoulette() {
           error.value = 'Network error while contacting Jikan. Check your internet and try again.'
           return
         }
-
         if (response.status === 429) {
           startCooldown(RETRY_SECONDS)
           error.value = `Rate-limited (429). Please wait ${RETRY_SECONDS}s before spinning again.`
           return
         }
-
         if (!response.ok || request.error.value) {
           error.value = `Something went wrong. Status: ${response?.status || 'unknown'}.`
           return
         }
 
         const candidateAnime = request.data.value?.data || null
-        if (!candidateAnime) {
-          error.value = 'Jikan returned an empty anime payload. Try spinning again.'
-          return
-        }
-
-        if (!isAllowedRating(candidateAnime.rating)) {
-          continue
-        }
+        if (!candidateAnime) continue
+        if (!isAllowedRating(candidateAnime.rating)) continue
 
         anime.value = candidateAnime
         return
@@ -63,5 +57,34 @@ export function useAnimeRoulette() {
     }
   }
 
-  return { anime, loading, error, spin, cooldownLeft }
+  const addToWatchlist = (animeToAdd) => {
+    if (!animeToAdd?.mal_id || watchlist.value.some((a) => a.mal_id === animeToAdd.mal_id)) return
+    watchlist.value.unshift({
+      mal_id: animeToAdd.mal_id,
+      title: animeToAdd.title,
+      score: animeToAdd.score,
+      episodes: animeToAdd.episodes,
+      rating: animeToAdd.rating,
+      url: animeToAdd.url,
+      image: animeToAdd.images?.jpg?.large_image_url || animeToAdd.images?.jpg?.image_url || '',
+    })
+  }
+
+  const removeFromWatchlist = (malId) => {
+    watchlist.value = watchlist.value.filter((a) => a.mal_id !== malId)
+  }
+
+  const isInWatchlist = (malId) => watchlist.value.some((a) => a.mal_id === malId)
+
+  return {
+    anime,
+    loading,
+    error,
+    spin,
+    cooldownLeft,
+    watchlist,
+    addToWatchlist,
+    removeFromWatchlist,
+    isInWatchlist,
+  }
 }
