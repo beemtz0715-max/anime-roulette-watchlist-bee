@@ -1,42 +1,54 @@
 <script setup>
-const spin = () => alert('Hello')
+import { ref } from 'vue'
+import AnimeCard from '@/components/AnimeCard.vue'
+
+const loading = ref(false)
+const error = ref('')
+
+const spin = () => {
+  console.log('Hello')
+  if (error.value.length > 0) {
+    error.value = ''
+  } else {
+    error.value = 'Something wrong'
+  }
+}
 </script>
 
 <template>
-  <main
-    class="min-h-screen bg-[radial-gradient(circle_at_15%_20%,#334155,transparent_40%),radial-gradient(circle_at_85%_0%,#0f766e,transparent_28%),linear-gradient(160deg,#020617,#0f172a,#111827)] px-4 py-8 text-slate-100 sm:px-6 lg:px-8"
-  >
-    <div class="mx-auto max-w-7xl">
-      <header class="mb-8">
-        <p class="text-xs font-semibold tracking-[0.3em] text-cyan-300/90 uppercase">Project #4</p>
-        <h1 class="mt-2 text-4xl font-black text-white sm:text-5xl">Anime Roulette Machine</h1>
-        <p class="mt-2 max-w-3xl text-sm text-slate-300 sm:text-base">
-          Spin the reel, request a random anime from Jikan with VueUse useFetch, and learn how REST
-          APIs signal rate limiting with HTTP 429.
-        </p>
-      </header>
+  <main class="p-5">
+    <div class="container mx-auto">
+      <div class="space-y-4">
+        <button
+          type="button"
+          class="rounded bg-cyan-500 px-4 py-2 text-white hover:bg-cyan-600"
+          @click="spin"
+        >
+          Spin Anime
+        </button>
 
-      <div class="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-        <section class="space-y-5">
-          <div
-            class="rounded-3xl border border-slate-700/70 bg-slate-900/60 p-5 shadow-2xl shadow-slate-950/30 backdrop-blur-sm"
+        <section class="space-y-4">
+          <AnimeCard :loading="true" />
+          <AnimeCard
+            :loading="loading"
+            :error="error"
+          />
+
+          <section
+            class="rounded-2xl border border-slate-700/60 bg-slate-800/50 p-6 text-center text-slate-300"
           >
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h2 class="text-xl font-bold text-white">Roulette</h2>
-                <p class="text-sm text-slate-300">
-                  Pull the lever for your next random anime recommendation.
-                </p>
-              </div>
-              <button
-                type="button"
-                class="cursor-pointer rounded-full border border-cyan-300/70 bg-cyan-400/20 px-6 py-3 text-base font-black tracking-wide text-cyan-100 hover:bg-cyan-400/30"
-                @click="spin"
-              >
-                Spin
-              </button>
+            <div
+              v-if="error"
+              class="rounded-2xl border border-red-300/50 bg-red-500/10 p-4 text-red-100"
+            >
+              <h3 class="text-lg font-semibold">Spin failed</h3>
+              <p class="mt-2 text-sm text-red-100/90">{{ error }}</p>
             </div>
-          </div>
+
+            <div v-else-if="loading">Loading...</div>
+
+            <div v-else>Pull the lever to request your first random anime.</div>
+          </section>
         </section>
       </div>
     </div>

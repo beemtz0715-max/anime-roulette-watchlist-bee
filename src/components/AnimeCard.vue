@@ -21,9 +21,15 @@ const props = defineProps({
 
 <template>
   <section
-    class="Oborder-slate-700/70 Obg-slate-900/60 rounded-3xl border p-5 shadow-2xl shadow-slate-950/30 backdrop-blur-sm"
+    class="rounded-3xl border border-slate-700/70 bg-slate-900/60 p-5 shadow-2xl shadow-slate-950/30 backdrop-blur-sm"
   >
-    <div v-if="props.loading">Loading ...</div>
+    <!-- Loading state -->
+    <div v-if="loading">Loading ...</div>
+
+    <!-- Error state -->
+    <div v-else-if="error">Error: {{ error }}</div>
+
+    <!-- Success / main content -->
     <div v-else>Done</div>
   </section>
 </template>
