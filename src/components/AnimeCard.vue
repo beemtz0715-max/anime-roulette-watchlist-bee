@@ -2,32 +2,51 @@
 import { computed, ref, watch } from 'vue'
 
 const props = defineProps({
-  anime: { type: Object, default: null },
-  loading: { type: Boolean, default: false },
-  error: { type: String, default: '' },
-  inWatchlist: { type: Boolean, default: false },
+  anime: {
+    type: Object,
+    default: null,
+  },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
+  error: {
+    type: String,
+    default: '',
+  },
+  inWatchlist: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits(['add'])
 
 const synopsisExpanded = ref(false)
 
-const animeImage = computed(
-  () =>
+const animeImage = computed(() => {
+  return (
     props.anime?.images?.jpg?.large_image_url ||
     props.anime?.images?.jpg?.image_url ||
     props.anime?.images?.webp?.large_image_url ||
     props.anime?.images?.webp?.image_url ||
-    '',
-)
+    ''
+  )
+})
 
-const synopsis = computed(() => props.anime?.synopsis || 'No synopsis available yet.')
+const synopsis = computed(() => {
+  return props.anime?.synopsis || 'No synopsis available yet.'
+})
+
 const needsTruncation = computed(() => synopsis.value.length > 240)
-const visibleSynopsis = computed(() =>
-  synopsisExpanded.value || !needsTruncation.value
-    ? synopsis.value
-    : `${synopsis.value.slice(0, 240)}...`,
-)
+
+const visibleSynopsis = computed(() => {
+  if (synopsisExpanded.value || !needsTruncation.value) {
+    return synopsis.value
+  }
+
+  return `${synopsis.value.slice(0, 240)}...`
+})
 
 watch(
   () => props.anime?.mal_id,
@@ -42,9 +61,23 @@ watch(
     class="rounded-3xl border border-slate-700/70 bg-slate-900/60 p-5 shadow-2xl shadow-slate-950/30 backdrop-blur-sm"
   >
     <div
-      v-if="loading"
-      class="h-72 animate-pulse rounded-2xl bg-slate-800"
-    ></div>
+      v-if="props.loading"
+      class="space-y-4"
+    >
+      <div class="flex items-center gap-3 text-cyan-300">
+        <div
+          class="h-5 w-5 animate-spin rounded-full border-2 border-cyan-400 border-t-transparent"
+        ></div>
+        <p class="font-semibold tracking-wide">Shuffling anime reels...</p>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2">
+        <div class="h-3 animate-pulse rounded bg-slate-700"></div>
+        <div class="h-3 animate-pulse rounded bg-slate-700"></div>
+        <div class="h-3 animate-pulse rounded bg-slate-700"></div>
+      </div>
+      <div class="h-72 animate-pulse rounded-2xl bg-slate-800"></div>
+    </div>
 
     <div
       v-else-if="error"

@@ -1,7 +1,11 @@
 <script setup>
 defineProps({
-  items: { type: Array, default: () => [] },
+  items: {
+    type: Array,
+    default: () => [],
+  },
 })
+
 const emit = defineEmits(['remove'])
 </script>
 
@@ -53,15 +57,15 @@ const emit = defineEmits(['remove'])
               ⭐ {{ item.score ?? 'N/A' }} · Ep {{ item.episodes ?? '?' }} ·
               {{ item.rating || 'Unrated' }}
             </p>
-
             <div class="mt-3 flex flex-wrap gap-2">
               <a
                 :href="item.url"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="text-xs font-semibold text-cyan-300 hover:underline"
-                >MAL Link</a
               >
+                MAL Link
+              </a>
               <button
                 type="button"
                 class="text-xs font-semibold text-rose-300 hover:underline"

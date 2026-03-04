@@ -1,8 +1,8 @@
 <script setup>
 import { computed } from 'vue'
 import AnimeCard from '@/components/AnimeCard.vue'
-import WatchList from '@/components/WatchList.vue'
 import { useAnimeRoulette } from '@/composables/useAnimeRoulette'
+import WatchList from '@/components/WatchList.vue'
 
 const {
   anime,
@@ -17,22 +17,31 @@ const {
 } = useAnimeRoulette()
 
 const spinDisabled = computed(() => loading.value || cooldownLeft.value > 0)
+
 const spinLabel = computed(() => {
-  if (loading.value) return 'Spinning...'
-  if (cooldownLeft.value > 0) return `Cooldown ${cooldownLeft.value}s`
+  if (loading.value) {
+    return 'Spinning...'
+  }
+
+  if (cooldownLeft.value > 0) {
+    return `Cooldown ${cooldownLeft.value}s`
+  }
+
   return 'SPIN 🎰'
 })
 </script>
 
 <template>
-  <main class="min-h-screen px-4 py-8 text-slate-100 sm:px-6 lg:px-8">
+  <main
+    class="min-h-screen bg-[radial-gradient(circle_at_15%_20%,#334155,transparent_40%),radial-gradient(circle_at_85%_0%,#0f766e,transparent_28%),linear-gradient(160deg,#020617,#0f172a,#111827)] px-4 py-8 text-slate-100 sm:px-6 lg:px-8"
+  >
     <div class="mx-auto max-w-7xl">
       <header class="mb-8">
         <p class="text-xs font-semibold tracking-[0.3em] text-cyan-300/90 uppercase">Project #4</p>
         <h1 class="mt-2 text-4xl font-black text-white sm:text-5xl">Anime Roulette Machine</h1>
         <p class="mt-2 max-w-3xl text-sm text-slate-300 sm:text-base">
-          Spin the reel, request a random anime from Jikan API, and learn how REST APIs signal rate
-          limiting with HTTP 429.
+          Spin the reel, request a random anime from Jinkan with VueUse useFech, and learnhow REST
+          APIs signal rate limiting with HTTP 429.
         </p>
       </header>
 
@@ -51,8 +60,8 @@ const spinLabel = computed(() => {
               <button
                 type="button"
                 :disabled="spinDisabled"
-                @click="spin"
                 class="cursor-pointer rounded-full border border-cyan-300/70 bg-cyan-400/20 px-6 py-3 text-base font-black tracking-wide text-cyan-100 hover:bg-cyan-400/30 disabled:cursor-not-allowed disabled:opacity-60"
+                @click="spin"
               >
                 {{ spinLabel }}
               </button>
@@ -64,7 +73,6 @@ const spinLabel = computed(() => {
               Rate-limited. Try again in {{ cooldownLeft }}s.
             </p>
           </div>
-
           <AnimeCard
             :loading="loading"
             :error="error"
@@ -73,7 +81,6 @@ const spinLabel = computed(() => {
             @add="addToWatchlist"
           />
         </section>
-
         <WatchList
           :items="watchlist"
           @remove="removeFromWatchlist"
