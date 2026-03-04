@@ -2,46 +2,32 @@
 import { computed, ref, watch } from 'vue'
 
 const props = defineProps({
-  anime: {
-    type: Object,
-    default: null,
-  },
-  loading: {
-    type: Boolean,
-    default: false,
-  },
-  error: {
-    type: String,
-    default: '',
-  },
-  inWatchlist: {
-    type: Boolean,
-    default: false,
-  },
+  anime: { type: Object, default: null },
+  loading: { type: Boolean, default: false },
+  error: { type: String, default: '' },
+  inWatchlist: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['add'])
 
 const synopsisExpanded = ref(false)
 
-const animeImage = computed(() => {
-  return (
+const animeImage = computed(
+  () =>
     props.anime?.images?.jpg?.large_image_url ||
     props.anime?.images?.jpg?.image_url ||
     props.anime?.images?.webp?.large_image_url ||
     props.anime?.images?.webp?.image_url ||
-    ''
-  )
-})
+    '',
+)
 
 const synopsis = computed(() => props.anime?.synopsis || 'No synopsis available yet.')
-
 const needsTruncation = computed(() => synopsis.value.length > 240)
-
-const visibleSynopsis = computed(() => {
-  if (synopsisExpanded.value || !needsTruncation.value) return synopsis.value
-  return `${synopsis.value.slice(0, 240)}...`
-})
+const visibleSynopsis = computed(() =>
+  synopsisExpanded.value || !needsTruncation.value
+    ? synopsis.value
+    : `${synopsis.value.slice(0, 240)}...`,
+)
 
 watch(
   () => props.anime?.mal_id,
